@@ -14,19 +14,25 @@ pipeline {
         
         stage('Sync to S3') {
             steps {
-                sh """
-                    aws s3 sync . s3://${S3_BUCKET}/ --delete
-                """
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
+                                  credentialsId: 'aws-s3-credentials']]) {
+                    sh """
+                        aws s3 sync . s3://${S3_BUCKET}/ \
+                            --delete \
+                            --exclude '.git/*' \
+                            --exclude '.gitignore'
+                    """
+                }
             }
         }
     }
     
     post {
         success {
-            echo 'Files successfully synced to S3!'
+            echo '✅ Files successfully synced to S3!'
         }
         failure {
-            echo 'Failed to sync files to S3'
+            echo '❌ Failed to sync files to S3'
         }
     }
 }
