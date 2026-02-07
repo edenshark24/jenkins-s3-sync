@@ -16,11 +16,8 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', 
                                   credentialsId: 'aws-s3-credentials']]) {
-                    sh """
-                        aws s3 sync . s3://${S3_BUCKET}/ \
-                            --delete \
-                            --exclude '.git/*' \
-                            --exclude '.gitignore'
+                    bat """
+                        aws s3 sync . s3://%S3_BUCKET%/ --delete --exclude ".git/*"
                     """
                 }
             }
